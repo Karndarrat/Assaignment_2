@@ -1,0 +1,115 @@
+<html lang="en">
+    <head>
+         
+        <meta charset="utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>React Tutorial | JavaScript</title>
+        <script src="build/react.min.js"></script>
+        <script src="build/JSXTransformer.js"></script>
+        <script src="build/jquery-3.3.1.js"></script>
+         
+        <style>
+        #content {
+            width:980px;margin:0 auto;border:1px solid #DDD;
+            padding:35px 35px 65px;text-align:left;margin-top:50px;
+        }
+        hr { margin:20px 0;border:0;border-top:1px solid #EEE; }
+        .text { text-align:center; }
+        .commentList { padding:0 15px; }
+        .commentForm { margin-top:35px;}
+        </style>
+    
+    </head>
+    <body style="text-align:center;padding:35px 0;">
+         
+        <h1>Welcome to service charge</h1>
+        <div id="content">
+            <p class="string">A JavaScript Library For Building User Interfaces (UI)</p>    
+        </div>
+         
+        <!-- เดิม <script type="text/javascript"> -->
+        <script type="text/jsx">
+            /* ส่วนที่ใช้เขียนคำสั่งเรียกใช้งาน ReactJS */
+
+var Comment = React.createClass({
+    render: function() {
+        return (
+            <div className='comment'>
+                <h3 className='commentAuthor'>
+                 เบอร์โทร :  {this.props.Tel}
+                </h3>
+                ค่าบริการ : {this.props.children} <hr />
+            </div>
+        );
+    }
+}); 
+
+var CommentForm = React.createClass({
+    render: function() {
+        return (
+            <div className='commentForm'>
+                <h2>ความคิดเห็น</h2> <hr />
+            </div>
+        );
+    }
+});  
+
+var CommentList = React.createClass({
+    render: function() {
+        var commentNodes = this.props.data.map(function (comment) {
+            return (
+                <Comment Tel={comment.Tel}>
+                    {comment.Cost}
+                </Comment>
+            );
+        });
+        return (
+            <div className="commentList">
+                {commentNodes}
+            </div>
+        );
+    }
+});  
+
+var CommentBox = React.createClass({
+    displayName: 'CommentBox',
+     loadCommentsFromServer: function() {
+        $.ajax({
+            url: this.props.source,
+            dataType: 'json',
+            cache: false,
+            success: function(data) {
+                this.setState({data: data});
+            }.bind(this),
+            error: function(xhr, status, err) {
+                console.error(this.props.source, status, err.toString());
+            }.bind(this)
+        });
+    },
+    getInitialState: function() {
+        return { data: [] };
+    },  
+    componentDidMount: function() {
+        this.loadCommentsFromServer();
+        setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+    },
+    render:function(){
+        return (
+            <div className='commentBox'>
+                <h2>เบอร์โทรและค่าบริการ</h2><hr />
+                <CommentList data={this.state.data} />
+                <CommentForm />
+            </div>
+        );
+    }
+});  
+
+React.render(
+    <CommentBox source="http://localhost/TestXampp/api/TelCost.json" pollInterval={2000} />,
+    document.getElementById('content')
+);  
+        </script>
+         
+    </body>
+</html> 
